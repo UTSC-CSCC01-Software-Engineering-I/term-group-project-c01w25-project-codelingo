@@ -1,15 +1,19 @@
 {
   "name": "problem-service",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "dependencies": {
+    "@google/generative-ai": "^0.22.0",
+    "axios": "^1.8.1",
+    "dotenv": "^16.4.7",
+    "openai": "^4.86.1"
+  }
 }
