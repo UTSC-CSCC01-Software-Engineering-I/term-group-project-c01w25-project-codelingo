@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export interface Filter {
+interface Filter {
   sort: 'latest' | 'popular';
   tag: string;
 }
