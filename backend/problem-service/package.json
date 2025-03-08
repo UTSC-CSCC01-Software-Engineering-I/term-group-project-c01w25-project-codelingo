@@ -1,15 +1,29 @@
 {
   "name": "problem-service",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "1.1.0",
+  "type": "module",
+  "description": "An Express service for managing problems with types and difficulty levels, using Firebase as a database.",
+  "main": "server.js",
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "test": "mocha './tests/*.js'"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "dependencies": {
+    "@google/generative-ai": "^0.22.0",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.18.2",
+    "firebase": "^9.0.0",
+    "firebase-admin": "^11.0.1"
+  },
+  "devDependencies": {
+    "chai": "^4.5.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^10.8.2"
+  }
 }

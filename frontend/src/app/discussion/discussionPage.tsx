@@ -1,23 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import DiscussionList from './discussionList';
+import DiscussionList, { Discussion } from './discussionList';
 import Pagination from './pagination';
-import FilterSort from './filterSort';
+import FilterSort, { Filter } from './filterSort';
 import { fetchDiscussions, createDiscussion } from './discussionApi';
 import './discussionPage.css';
 import background from "../../assets/landing.jpg";
-
-interface Discussion {
-  id: number;
-  title: string;
-  author: string;
-  createdAt: string;
-  commentCount: number;
-}
-
-interface Filter {
-  sort: 'latest' | 'popular';
-  tag: string;
-}
 
 const DiscussionsPage: React.FC = () => {
   const [discussions, setDiscussions] = useState<Discussion[]>([]);
@@ -30,19 +17,23 @@ const DiscussionsPage: React.FC = () => {
     content: '',
   });
 
+  const ITEMS_PER_PAGE = 6;
+
   useEffect(() => {
     const loadDiscussions = async () => {
       try {
-        const data = await fetchDiscussions(currentPage, filter);
-        setDiscussions(data.discussions);
-        setTotalPages(data.totalPages);
+        const data = await fetchDiscussions();
+        console.log(data);
+        setDiscussions(data);
+        console.log(discussions);
+        setTotalPages(Math.ceil(data.length / ITEMS_PER_PAGE));
       } catch (error) {
         console.error('Failed to fetch discussions:', error);
       }
     };
 
     loadDiscussions();
-  }, [currentPage, filter]);
+  }, []);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -74,13 +65,16 @@ const DiscussionsPage: React.FC = () => {
       setShowCreateForm(false);
       setNewDiscussion({ title: '', content: '' });
       // Re-fetch discussions
-      const data = await fetchDiscussions(currentPage, filter);
-      setDiscussions(data.discussions);
-      setTotalPages(data.totalPages);
+      const data = await fetchDiscussions();
+      setDiscussions(data);
+      setTotalPages(Math.ceil(data.length / ITEMS_PER_PAGE));
     } catch (error) {
       console.error('Failed to create discussion:', error);
     }
   };
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentDiscussions = discussions.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
     <div
@@ -97,18 +91,19 @@ const DiscussionsPage: React.FC = () => {
       <div className="flex flex-col justify-center items-center h-full">
         {/* Only show these elements when the form is not shown */}
         {!showCreateForm && (
-          <>
-            <h1 className="text-white text-6xl m-5 font-mono font-bold">Discussion Panel</h1>
-            {/* Show filter only if there are discussions */}
-            {discussions.length > 0 && (
-              <FilterSort filter={filter} onFilterChange={handleFilterChange} />
-            )}
-            {discussions.length === 0 && (
-              <p className="text-white font-thin italic m-5">
-                No current discussions. Start a discussion below.
-              </p>
-            )}
-          </>
+        <>
+          <h1 className="text-white text-6xl m-5 font-mono font-bold">Discussion Panel</h1>
+          {/* Show filter only if there are discussions */}
+          {discussions?.length > 0 && (
+            //<FilterSort filter={filter} onFilterChange={handleFilterChange} />
+            <DiscussionList discussions={currentDiscussions}/>
+          )}
+          {discussions?.length === 0 && (
+            <p className="text-white font-thin italic m-5">
+              No current discussions. Start a discussion below.
+            </p>
+          )}
+        </>
         )}
 
         {/* Start a Discussion button (hidden when the form is shown) */}
@@ -157,14 +152,13 @@ const DiscussionsPage: React.FC = () => {
           </form>
         )}
 
-        {/* Pagination at the bottom */}
-        <div>
+        {discussions.length > ITEMS_PER_PAGE && (
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={handlePageChange}
           />
-        </div>
+        )}
       </div>
     </div>
   );
