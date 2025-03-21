@@ -6,6 +6,7 @@ import { cpp } from "@codemirror/lang-cpp";
 import { dracula } from "@uiw/codemirror-theme-dracula";
 import { runCode } from "./problemApi";
 import { useLocation } from "react-router-dom";
+import axios from "axios";
 
 const CodeEditor = () => {
   const location = useLocation();
@@ -15,6 +16,12 @@ const CodeEditor = () => {
   const [loading, setLoading] = useState(true);
   const [problem, setProblem] = useState(location.state?.problem || {});
   const [result, setResult] = useState({});
+
+  // State for Save Code feature
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [filename, setFilename] = useState("");
+  const [repoUrl, setRepoUrl] = useState("");
+  const [accessToken, setAccessToken] = useState(""); // Assume this is set elsewhere after OAuth
 
   const getParameterString = () => {
     return Object.keys(problem.testCases[0].input).join(", ");
@@ -72,6 +79,45 @@ const CodeEditor = () => {
     }
   };
 
+  const handleSaveCode = () => {
+    setIsPopupOpen(true);
+  };
+
+  const parseRepositoryUrl = (url) => {
+    const match = url.match(/https:\/\/github\.com\/([^/]+)\/([^/]+)/);
+    if (match) {
+      const username = match[1];
+      const repoName = match[2];
+      return { username, repoName };
+    } else {
+      throw new Error("Invalid GitHub repository URL");
+    }
+  };
+
+  const handleSaveToGithub = async () => {
+    try {
+      const { username, repoName } = parseRepositoryUrl(repoUrl);
+
+      const response = await axios.put(
+        `https://api.github.com/repos/${username}/${repoName}/contents/${filename}`,
+        {
+          message: "Add new code file",
+          content: btoa(code), // Base64 encode the code
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      alert("Code saved to GitHub successfully!");
+    } catch (error) {
+      console.error("Error saving to GitHub: ", error);
+      alert("Failed to save code to GitHub.");
+    }
+    setIsPopupOpen(false);
+  };
+
   const stringify = (value) => {
     return JSON.stringify(value, null, 2);
   };
@@ -121,6 +167,12 @@ const CodeEditor = () => {
         >
           Run Code
         </button>
+        <button
+          className="bg-green-500 p-2 rounded hover:bg-green-600 transition"
+          onClick={handleSaveCode}
+        >
+          Save Code
+        </button>
         <select
           className="p-3 bg-gray-700 text-white rounded"
           value={language}
@@ -157,6 +209,47 @@ const CodeEditor = () => {
         <h3 className="text-lg font-semibold">Tests passed:</h3>
         <pre className="whitespace-pre-wrap">{output}</pre>
       </div>
+
+      {isPopupOpen && (
+        <div className="popup fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="popup-inner bg-white p-6 rounded shadow-lg text-black">
+            <h3 className="font-bold mb-4">Save to GitHub</h3>
+            <label className="block font-medium">
+              GitHub Repository URL:
+              <input
+                type="text"
+                value={repoUrl}
+                onChange={(e) => setRepoUrl(e.target.value)}
+                className="block p-2 border border-gray-300 rounded mt-2 mb-4 w-full"
+                placeholder="https://github.com/username/repo"
+              />
+            </label>
+            <label className="block font-medium">
+              Filename:
+              <input
+                type="text"
+                value={filename}
+                onChange={(e) => setFilename(e.target.value)}
+                className="block p-2 border border-gray-300 rounded mt-2 mb-4 w-full"
+              />
+            </label>
+            <div className="flex justify-end">
+              <button
+                onClick={handleSaveToGithub}
+                className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition"
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setIsPopupOpen(false)}
+                className="bg-gray-500 text-white p-2 rounded hover:bg-gray-600 transition ml-2"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
