@@ -1,5 +1,5 @@
-// import { db } from '../../../shared/initFirebase.js';
-import database from "../../../shared/firebaseConfig.js";
+import { db } from '../../../shared/initFirebase.js';
+// import database from "../../../shared/firebaseConfig.js";
 import {
   ref,
   push,
@@ -57,7 +57,7 @@ export const addProblem = (req, res) => {
     return res.status(400).send("Problem difficulty must be between 1 and 10.");
   }
 
-  const newProblemRef = ref(database, "problems");
+  const newProblemRef = ref(db, "problems");
   push(newProblemRef, {
     title,
     problemType,
@@ -73,7 +73,7 @@ export const addProblem = (req, res) => {
   })
     .then(() => {
 tags.forEach((tag) => {
-      const tagRef = ref(database, `tags/${tag}`);
+      const tagRef = ref(db, `tags/${tag}`);
 
       get(tagRef)
         .then((snapshot) => {
@@ -111,7 +111,7 @@ export const getProblemsByDifficulty = (req, res) => {
   // Convert difficulty to integer
   const difficultyInt = parseInt(difficulty, 10);
 
-  const problemsRef = ref(database, "problems");
+  const problemsRef = ref(db, "problems");
   const difficultyQuery = query(
     problemsRef,
     orderByChild("problemDifficulty"),
@@ -142,7 +142,7 @@ export const getProblemsByType = (req, res) => {
     return res.status(400).send("Problem type is required.");
   }
 
-  const problemsRef = ref(database, "problems");
+  const problemsRef = ref(db, "problems");
   const typeQuery = query(
     problemsRef,
     orderByChild("problemType"),
@@ -170,7 +170,7 @@ export const getProblemsByTags = async (req, res) => {
     return res.status(400).send("Problem tag is required.");
   }
 
-  const problemsRef = ref(database, "problems");
+  const problemsRef = ref(db, "problems");
 
   try {
     const snapshot = await get(problemsRef);
@@ -228,7 +228,7 @@ export const generateProblem = async (req, res) => {
 };
 
 export const getProblemsAll = async (req, res) => {
-  const problemsRef = ref(database, "problems");
+  const problemsRef = ref(db, "problems");
 
   try {
     const snapshot = await get(problemsRef);
@@ -290,7 +290,7 @@ export const executeCode = (req, res) => {
 
 
 export const getAllTags = async (req, res) => {
-  const tagsRef = ref(database, "tags");
+  const tagsRef = ref(db, "tags");
 
   try {
     const snapshot = await get(tagsRef);

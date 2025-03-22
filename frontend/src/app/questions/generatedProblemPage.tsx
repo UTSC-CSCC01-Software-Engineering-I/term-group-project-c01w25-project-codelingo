@@ -57,9 +57,7 @@ const GeneratedProblemPage = () => {
         navigate("/mcq", { state: { problem: generatedProblem } });
         break;
       case "fill":
-        navigate("/fill-in-the-blank", {
-          state: { problem: generatedProblem },
-        });
+        navigate("/fill-in-the-blank", { state: { problem: generatedProblem } });
         break;
       default:
         break;

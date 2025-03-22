@@ -76,7 +76,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({ selectedTags, onTagToggle }) 
           ) : (
             filteredAndSortedTags.map((tag) => (
               <option key={tag.tag} value={tag.tag}>
-                {tag.tag} {tag.count > 5 && "🔥"}
+                {tag.tag}
               </option>
             ))
           )}

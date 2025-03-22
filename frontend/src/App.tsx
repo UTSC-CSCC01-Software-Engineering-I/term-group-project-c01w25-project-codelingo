@@ -18,6 +18,7 @@ import PlayerLobby from "./app/lobby/playerLobby";
 import { SocketProvider } from "./socketContext";
 import JoinLobby from "./app/lobby/joinLobby";
 import PostGame from "./app/lobby/postGamePage"
+import McqPage from "./app/questions/mcqPage";
 
 function App() {
   return (
@@ -30,23 +31,18 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/discussions" element={<DiscussionsPage />} />
-            <Route
-              path="/discussions/new-discussion"
-              element={<DiscussionFormPage />}
-            />
+            <Route path="/discussions/new-discussion" element={<DiscussionFormPage />} />
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/problems" element={<ProblemPage />} />
             <Route path="/coding" element={<CodingPage />} />
-            <Route
-              path="/problems/generated"
-              element={<GeneratedProblemPage />}
-            />
+            <Route path="/problems/generated" element={<GeneratedProblemPage />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/reset-password" element={<ForgotPassword />} />
             <Route path="/lobby" element={<Lobby />} />
             <Route path="/player-lobby/:code" element={<PlayerLobby />} />
             <Route path="/join-lobby" element={<JoinLobby />} />
+            <Route path="/mcq" element={<McqPage />} />
           </Routes>
         </BrowserRouter>
       </SocketProvider>

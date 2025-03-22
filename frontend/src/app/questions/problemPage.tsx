@@ -217,8 +217,8 @@ const ProblemPage = () => {
       {/* Loading... */}
       {loading && <p>Generating...</p>}
 
-        {/* Show error */}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+      {/* Show error */}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 };
