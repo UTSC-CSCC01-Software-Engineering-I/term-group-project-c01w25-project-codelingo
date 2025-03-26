@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
 import { java } from "@codemirror/lang-java";
@@ -7,14 +7,22 @@ import { dracula } from "@uiw/codemirror-theme-dracula";
 import { runCode } from "./problemApi";
 import { useLocation } from "react-router-dom";
 
+interface TestCaseResult {
+  correct: boolean;
+  // Add more fields if necessary
+}
+interface Result {
+  results: TestCaseResult[];
+}
+
 const CodeEditor = () => {
   const location = useLocation();
 
   const [language, setLanguage] = useState("python");
   const [output, setOutput] = useState("");
   const [loading, setLoading] = useState(true);
-  const [problem, setProblem] = useState(location.state?.problem || {});
-  const [result, setResult] = useState({});
+  const [problem] = useState(location.state?.problem || {});
+  const [result, setResult] = useState<Result>({results: [] });
 
   const getParameterString = () => {
     return Object.keys(problem.testCases[0].input).join(", ");

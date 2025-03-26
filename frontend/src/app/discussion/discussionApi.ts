@@ -3,10 +3,10 @@ import { Discussion } from './discussionList.tsx'
 const { disc } = config.api;
 
   
-  interface Filter {
-    sort: 'latest' | 'popular';
-    tag: string;
-  }
+  // interface Filter {
+  //   sort: 'latest' | 'popular';
+  //   tag: string;
+  // }
   
   interface CreateDiscussionResponse {
     id: number;

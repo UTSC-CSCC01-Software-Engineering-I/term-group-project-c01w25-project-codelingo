@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import io from "socket.io-client";
+import { createContext, useContext, useEffect, useState } from "react";
+import io, { Socket } from "socket.io-client";
 import { config } from "./config";
 
 const { match } = config.api;
@@ -15,12 +15,14 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const newSocket = io(match);
+    const newSocket: Socket = io(match);
     setSocket(newSocket);
 
-    // Cleanup on unmount
-    return () => newSocket.close();
-  }, []);
+    // Clean up the socket connection on unmount
+    return () => {
+      newSocket.close();
+    };
+  }, []); 
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>

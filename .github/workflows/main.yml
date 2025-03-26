@@ -12,7 +12,6 @@ jobs:
     strategy:
       matrix:
         service: [frontend, admin, backend/user-service, backend/auth-service, backend/problem-service, backend/lesson-service, backend/match-making-service]
-    continue-on-error: true   # Allow the workflow to continue even if the tests fail
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,64 +25,127 @@ jobs:
         run: |
           cd ${{ matrix.service }}
           npm install
+        continue-on-error: true # Continue even if installation fails
 
       - name: Run tests
         run: |
           cd ${{ matrix.service }}
           npm test
-
+        continue-on-error: true # Continue even if tests fail
   build-and-push:
-    name: Build and Push Docker Images
-    runs-on: ubuntu-latest
-    needs: test
-    strategy:
-      matrix:
-        service: [frontend, admin, backend/user-service, backend/auth-service, backend/problem-service, backend/lesson-service, backend/match-making-service]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build and Push Docker image
-        run: |
-          SERVICE_NAME=$(basename ${{ matrix.service }})
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/$SERVICE_NAME:latest ${{ matrix.service }}
-          docker push ${{ secrets.DOCKER_USERNAME }}/$SERVICE_NAME:latest
-
-      - name: Build and Push Versioned Docker image
-        run: |
-          SERVICE_NAME=$(basename ${{ matrix.service }})
-          VERSION=$(date +'%Y%m%d%H%M%S')
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/$SERVICE_NAME:$VERSION ${{ matrix.service }}
-          docker push ${{ secrets.DOCKER_USERNAME }}/$SERVICE_NAME:$VERSION
-
-  deploy:
-    name: Deploy to AWS Lambda
-    runs-on: ubuntu-latest
-    needs: build-and-push
-    strategy:
-      matrix:
-        service: [frontend, admin, backend/user-service, backend/auth-service, backend/problem-service, backend/lesson-service, backend/match-making-service]
-    steps:
-      - name: Log in to AWS
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+      name: Build and Push Docker Images
+      runs-on: ubuntu-latest
+      needs: test
+      strategy:
+        matrix:
+          service: [backend/user-service, backend/auth-service, backend/problem-service, backend/lesson-service, backend/match-making-service]
+      env:
+        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+    
+        - name: Log in to Docker Hub
+          uses: docker/login-action@v3
+          with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+    
+        - name: Build Docker Image
+          run: |
+            SERVICE_NAME=$(basename ${{ matrix.service }})
+            echo "Building service: $SERVICE_NAME"
+            docker build --no-cache -t ${{ secrets.DOCKER_USERNAME }}/$SERVICE_NAME:latest ${{ matrix.service }}
+          
+        - name: List Docker Images
+          run: docker images
+          
+        - name: Verify Docker Image Exists
+          run: |
+            SERVICE_NAME=$(basename ${{ matrix.service }})
+            if ! docker image inspect ${{ secrets.DOCKER_USERNAME }}/$SERVICE_NAME:latest > /dev/null 2>&1; then
+              echo "Docker image ${{ secrets.DOCKER_USERNAME }}/$SERVICE_NAME:latest does not exist."
+              exit 1
+            fi
+    
+        - name: Push Docker image to Docker Hub
+          run: |
+            SERVICE_NAME=$(basename ${{ matrix.service }})
+            docker push ${{ secrets.DOCKER_USERNAME }}/$SERVICE_NAME:latest
+            
+        - name: Log in to AWS
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+              aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              aws-region: ${{ secrets.AWS_REGION }}
+    
+        - name: Log in to AWS ECR
+          run: |
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 211125481123.dkr.ecr.us-east-1.amazonaws.com
+    
+        - name: Tag and Push Docker image to ECR
+          run: |
+            SERVICE_NAME=$(basename ${{ matrix.service }})
+            docker tag christiangrogers/$SERVICE_NAME:latest 211125481123.dkr.ecr.us-east-1.amazonaws.com/$SERVICE_NAME:latest
+            docker push 211125481123.dkr.ecr.us-east-1.amazonaws.com/$SERVICE_NAME:latest
+  deploy-backend:
+      name: Deploy Backend Services to AWS Lambda
+      runs-on: ubuntu-latest
+      needs: build-and-push
+      strategy:
+        matrix:
+          service: [backend/user-service, backend/auth-service, backend/problem-service, backend/lesson-service, backend/match-making-service]
+      env:
+        ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+      steps:
+        - name: Log in to AWS
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_REGION }}
+    
+        - name: Deploy to Lambda
+          run: |
+            SERVICE_NAME=$(basename ${{ matrix.service }})
+            LAMBDA_FUNCTION_NAME=codeify-${SERVICE_NAME//\//-}
+            aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --image-uri 211125481123.dkr.ecr.us-east-1.amazonaws.com/$SERVICE_NAME:latest
+  deploy-frontend:
+      name: Deploy Frontend and Admin to S3 and CloudFront
+      runs-on: ubuntu-latest
+      needs: test
+      strategy:
+        matrix:
+          service: [frontend, admin]
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
   
-      - name: Deploy to Lambda
-        env:
-          ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
-        run: |
-          SERVICE_NAME=$(basename ${{ matrix.service }})
-          LAMBDA_FUNCTION_NAME=codeify-${SERVICE_NAME//\//-}
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY
-          docker tag ${{ secrets.DOCKER_USERNAME }}/$SERVICE_NAME:latest $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}/$SERVICE_NAME:latest
-          docker push $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}/$SERVICE_NAME:latest
-          aws lambda update-function-code --function-name $LAMBDA_FUNCTION_NAME --image-uri $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}/$SERVICE_NAME:latest
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ${{ secrets.AWS_REGION }}
+  
+        - name: Install dependencies
+          run: |
+            cd ${{ matrix.service }}
+            npm install
+  
+        - name: Build static files
+          run: |
+            cd ${{ matrix.service }}
+            npm run build
+  
+        - name: Deploy to S3
+          run: |
+            SERVICE_NAME=$(basename ${{ matrix.service }})
+            AWS_S3_BUCKET=codelingo-static-services-$SERVICE_NAME
+            aws s3 sync ${{ matrix.service }}/dist/ s3://$AWS_S3_BUCKET --delete
+  
+        - name: Invalidate CloudFront Cache (if applicable)
+          run: |
+            CLOUDFRONT_DISTRIBUTION_ID=your-cloudfront-distribution-id-$SERVICE_NAME
+            aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"

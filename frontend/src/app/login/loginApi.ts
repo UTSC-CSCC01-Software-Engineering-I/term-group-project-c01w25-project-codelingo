@@ -1,3 +1,6 @@
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../firebase";
+
 export const API_BASE_URL = "http://localhost:8081/api/auth";
 
 export const loginUser = async (email: string, password: string) => {
@@ -6,7 +9,8 @@ export const loginUser = async (email: string, password: string) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
     });
-
+    const bruh = await signInWithEmailAndPassword(auth, email, password);
+    console.log(bruh);
     return response.json();
 };
 

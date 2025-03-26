@@ -1,16 +1,16 @@
 import background from "../../assets/landing.jpg";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { config } from "../../config.ts";
-const { match } = config.api;
+//import { config } from "../../config.ts";
+//const { match } = config.api;
 import { useSocket } from "../../socketContext";
 
 function PlayerLobby() {
   const socket = useSocket();
   const navigate = useNavigate();
   const location = useLocation();
-  const [lobbyCode, setLobbyCode] = useState(location.state?.lobbyCode);
-  const [username, setUsername] = useState("");
+  const [lobbyCode] = useState(location.state?.lobbyCode);
+  //const [username, setUsername] = useState("");
   const [players, setPlayers] = useState([]);
 
   useEffect(() => {

@@ -1,8 +1,10 @@
 import background from "../../assets/landing.jpg";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Landing() {
   const text = "CodeLingo";
+  const { user } = useAuth();
   return (
     <>
       <div
@@ -44,20 +46,22 @@ function Landing() {
           engaging and interactive way to level up your coding game. Compete,
           learn, and grow—one question at a time!
         </p>
-        <div className="fade-in">
-          <Link
-            to="/login"
-            className="bg-white font-light py-2 px-16 m-10 rounded-full mt-10"
-          >
-            Sign In
-          </Link>
-          <Link
-            to="/register"
-            className="bg-sky-200 font-light py-2 px-15 m-10 rounded-full mt-10"
-          >
-            Register
-          </Link>
-        </div>
+        {!user && (
+          <div className="fade-in">
+            <Link
+              to="/login"
+              className="bg-white font-light py-2 px-16 m-10 rounded-full mt-10"
+            >
+              Login
+            </Link>
+            <Link
+              to="/register"
+              className="bg-sky-200 font-light py-2 px-15 m-10 rounded-full mt-10"
+            >
+              Register
+            </Link>
+          </div>
+        )}
       </div>
     </>
   );

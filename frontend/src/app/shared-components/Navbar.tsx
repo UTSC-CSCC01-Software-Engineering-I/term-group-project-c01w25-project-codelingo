@@ -1,80 +1,100 @@
 import { NavLink } from "react-router-dom";
-import "../styles/navbar.css";
+import { useAuth } from "../context/AuthContext";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase";
+
 function Navbar() {
+  const { user } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  const navStyle = ({ isActive }: { isActive: boolean }) =>
+    `nav-link text-black hover:underline ${isActive ? "font-semibold underline" : ""}`;
+
   return (
-    <>
-      <nav className="flex justify-end">
-        <ul className="flex justify-center mr-85">
-          <li className="mx-8 my-6">
+    <nav className="flex justify-between items-center px-10 py-6 bg-white shadow-md">
+      {/* Left-side nav */}
+      <ul className="flex items-center space-x-8">
+        <li>
+          <NavLink to="/" className={navStyle}>
+            Home
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/about" className={navStyle}>
+            About
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/contact" className={navStyle}>
+            Contact
+          </NavLink>
+        </li>
+
+        {user && (
+          <>
+            <li>
+              <NavLink to="/problems" className={navStyle}>
+                Challenges
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/discussions" className={navStyle}>
+                Discussions
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/lobby" className={navStyle}>
+                Lobby
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/join-lobby" className={navStyle} >
+                Join Lobby
+              </NavLink>
+            </li>
+          </>
+        )}
+      </ul>
+
+      {/* Right-side nav */}
+      {user ? (
+        <ul>
+          <li>
             <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
-              }
+              to="#"
+              onClick={(e) => {
+                e.preventDefault();
+                handleLogout();
+              }}
+              className="nav-link text-black hover:underline"
             >
-              Home
-            </NavLink>
-          </li>
-          <li className="mx-8 my-6">
-            <NavLink
-              to="/about"
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
-              }
-            >
-              About
-            </NavLink>
-          </li>
-          <li className="mx-8 my-6">
-            <NavLink
-              to="/problems"
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
-              }
-            >
-              Challenges
-            </NavLink>
-          </li>
-          <li className="mx-8 my-6">
-            <NavLink
-              to="/discussions"
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
-              }
-            >
-              Discussions
-            </NavLink>
-          </li>
-          <li className="mx-8 my-6">
-            <NavLink
-              to="/contact"
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
-              }
-            >
-              Contact
-            </NavLink>
-          </li>
-          <li className="mx-8 my-6">
-            <NavLink
-              to="/lobby"
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "active" : ""}`
-              }
-            >
-              Lobby
+              Logout
             </NavLink>
           </li>
         </ul>
-        <ul className="">
-          <li className="mx-8 my-6 text-sm text-white bg-blue-600 py-1 px-2 rounded-3xl">
-            <NavLink to="/join-lobby">
-              <span className="text-white">Join Lobby</span>
+      ) : (
+        <ul className="flex space-x-6">
+          <li>
+            <NavLink to="/login" className={navStyle}>
+              Login
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/register" className={navStyle}>
+              Register
             </NavLink>
           </li>
         </ul>
-      </nav>
-    </>
+      )}
+    </nav>
   );
 }
 

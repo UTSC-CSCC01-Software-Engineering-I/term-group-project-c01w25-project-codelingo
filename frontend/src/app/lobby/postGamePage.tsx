@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom'; // Import hooks from React Router
 import background from "../../assets/landing.jpg"; // Import background image for styling
 import '../styles/general.css'; // Import general styles

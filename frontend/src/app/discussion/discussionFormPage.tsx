@@ -9,7 +9,7 @@ import background from "../../assets/landing.jpg";
 const DiscussionForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { previousPage, problemId, problemTitle, problemDescription, problemTags } = location.state || {};
+  const { previousPage, problemTitle, problemDescription } = location.state || {};
   const [newDiscussion, setNewDiscussion] = useState({
     title: problemTitle || '',
     content: problemDescription || '',

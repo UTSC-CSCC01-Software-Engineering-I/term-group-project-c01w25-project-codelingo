@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DiscussionList, { Discussion } from './discussionList';
 import Pagination from './pagination';
-import FilterSort, { Filter } from './filterSort';
+//import FilterSort, { Filter } from './filterSort';
 import { useNavigate } from 'react-router-dom';
 import { fetchDiscussions } from './discussionApi';
 import '../styles/general.css';
@@ -12,7 +12,7 @@ const DiscussionsPage: React.FC = () => {
   const [discussions, setDiscussions] = useState<Discussion[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-  const [filter, setFilter] = useState<Filter>({ sort: 'latest', tag: '' });
+  //const [filter, setFilter] = useState<Filter>({ sort: 'latest', tag: '' });
 
   const ITEMS_PER_PAGE = 8;
 
@@ -38,10 +38,10 @@ const DiscussionsPage: React.FC = () => {
     setCurrentPage(page);
   };
 
-  const handleFilterChange = (newFilter: Filter) => {
-    setFilter(newFilter);
-    setCurrentPage(1);
-  };
+  // const handleFilterChange = (newFilter: Filter) => {
+  //   setFilter(newFilter);
+  //   setCurrentPage(1);
+  // };
 
   const handleCreateDiscussionClick = () => {
     navigate('/discussions/new-discussion');
@@ -83,9 +83,17 @@ const DiscussionsPage: React.FC = () => {
         </>
 
         {/* Start a Discussion button (hidden when the form is shown) */}
-          <button onClick={handleCreateDiscussionClick} className="m-5">
-            Start a Discussion
-          </button>
+          <button
+              onClick={handleCreateDiscussionClick}
+              className="fade-in text-white bg-gradient-to-r from-indigo-800
+                        via-indigo-600 to-blue-500 hover:bg-gradient-to-br
+                        focus:ring-3 focus:outline-none focus:ring-cyan-300
+                        dark:focus:ring-cyan-800 shadow-lg shadow-cyan-500/50
+                        dark:shadow-lg dark:shadow-cyan-800/80 font-bold
+                        rounded-2xl text-2xl px-10 py-6 w-full max-w-md text-center mb-6 transition-all duration-300"
+            >
+              Start Discussion
+            </button>
 
         {discussions.length > ITEMS_PER_PAGE && (
           <Pagination
