@@ -52,7 +52,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-EXPOSE 8085
+EXPOSE xxxx
 CMD ["npm", "run"]
 ```
 
@@ -73,7 +73,7 @@ npm install
 npm test
 # or to build and run
 docker build -t user-service .
-docker run -p 8085:8085 user-service
+docker run -p xxxx:xxxx user-service
 ```
 
 ## 📝 Authors
