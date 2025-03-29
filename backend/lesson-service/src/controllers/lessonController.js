@@ -1,4 +1,4 @@
-import database from '../../shared/firebaseConfig.js';
+import database from '../../../shared/firebaseConfig.js';
 import { ref, push, query, orderByChild, equalTo, get } from 'firebase/database';
 
 // Add a lesson

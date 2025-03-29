@@ -1,4 +1,4 @@
-import { db } from '../../shared/initFirebase.js';
+import { db } from '../../../shared/initFirebase.js';
 // import verifyToken from '../../../shared/verifyToken.js';
 
 export default {

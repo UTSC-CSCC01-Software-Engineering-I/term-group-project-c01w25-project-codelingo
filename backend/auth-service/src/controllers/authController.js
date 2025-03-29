@@ -1,4 +1,4 @@
-import { admin, db } from '../../shared/initFirebase.js';
+import { admin, db } from '../../../shared/initFirebase.js';
 import { sendVerificationEmail } from '../services/authService.js';
 import crypto from "crypto-js";
 

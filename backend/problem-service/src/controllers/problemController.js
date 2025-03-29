@@ -1,4 +1,4 @@
-import { db } from '../../shared/initFirebase.js';
+import { db } from '../../../shared/initFirebase.js';
 // import database from "../../../shared/firebaseConfig.js";
 import {
   ref,
