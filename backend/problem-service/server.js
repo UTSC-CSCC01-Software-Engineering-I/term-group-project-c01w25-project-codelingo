@@ -9,11 +9,10 @@ import bodyParser from 'body-parser';
 const app = express();
 const port = 8083;
 
-const corsConfig = {
-  origin: ['http://localhost:3000', 'http://localhost:5173'],
+app.use(cors({
+  origin: '*',
   credentials: true
-};
-app.use(cors(corsConfig));
+}));
 app.use(express.json());
 app.use(bodyParser.json());
 
