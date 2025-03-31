@@ -4,28 +4,34 @@ import { useLocation, useNavigate } from "react-router-dom";
 //import { config } from "../../config.ts";
 //const { match } = config.api;
 import { useSocket } from "../../socketContext";
+import { useAuth } from "../context/AuthContext";
 
 function PlayerLobby() {
+  const { user } = useAuth();
   const socket = useSocket();
   const navigate = useNavigate();
   const location = useLocation();
   const [lobbyCode] = useState(location.state?.lobbyCode);
   //const [username, setUsername] = useState("");
   const [players, setPlayers] = useState([]);
+  const [nameMap, setNameMap] = useState({});
 
   useEffect(() => {
     if (socket) {
-      socket.emit("joinLobby", lobbyCode);
+      socket.emit("joinLobby", lobbyCode, user.displayName);
     }
   }, []);
 
   useEffect(() => {
-    socket.on("updateUsers", (players) => {
+    socket.on("updateUsers", (players, nameMap) => {
+      setNameMap(nameMap);
       setPlayers(players);
     });
 
     socket.on("codingProblem", (lobbyProblem) => {
-      navigate("/coding", { state: { problem: lobbyProblem } });
+      navigate("/coding", {
+        state: { problem: lobbyProblem, lobbyCode: lobbyCode },
+      });
     });
 
     return () => {
@@ -42,7 +48,9 @@ function PlayerLobby() {
   }; */
 
   const handleLeaveLobby = () => {
-    socket.emit("leaveLobby", lobbyCode);
+    socket.emit("leaveLobby", lobbyCode, (response) => {
+      console.log("left");
+    });
     navigate("/join-lobby");
   };
 
@@ -79,16 +87,16 @@ function PlayerLobby() {
             {players.length > 0 ? (
               <ul className="space-y-2">
                 <li className="text-2xl bg-gray-600 p-2 rounded h-12">
-                  {players && players.length > 0 ? players[0] : ""}
+                  {players && players.length > 0 ? nameMap[players[0]] : ""}
                 </li>
                 <li className="text-2xl bg-gray-600 p-2 rounded h-12">
-                  {players && players.length > 1 ? players[1] : ""}
+                  {players && players.length > 1 ? nameMap[players[1]] : ""}
                 </li>
                 <li className="text-2xl bg-gray-600 p-2 rounded h-12">
-                  {players && players.length > 2 ? players[2] : ""}
+                  {players && players.length > 2 ? nameMap[players[2]] : ""}
                 </li>
                 <li className="text-2xl bg-gray-600 p-2 rounded h-12">
-                  {players && players.length > 3 ? players[3] : ""}
+                  {players && players.length > 3 ? nameMap[players[3]] : ""}
                 </li>
               </ul>
             ) : (

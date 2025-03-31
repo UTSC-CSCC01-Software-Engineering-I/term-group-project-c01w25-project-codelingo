@@ -27,7 +27,12 @@ io.on("connection", (socket) => {
   // Handle lobby creation
   socket.on("createLobby", (problem, callback) => {
     const lobbyCode = Math.random().toString(36).substr(2, 6); // Generate a unique code
-    lobbies[lobbyCode] = { users: [], lobbyProblem: problem }; // Initialize the lobby with the creator's socket ID
+    lobbies[lobbyCode] = {
+      users: [],
+      lobbyProblem: problem,
+      scores: {},
+      names: {},
+    }; // Initialize the lobby with the creator's socket ID
 
     console.log(socket.id, `created lobby: ${lobbyCode}`);
     console.log(lobbies);
@@ -37,7 +42,7 @@ io.on("connection", (socket) => {
   });
 
   // Handle joining a lobby
-  socket.on("joinLobby", (lobbyCode, callback) => {
+  socket.on("joinLobby", (lobbyCode, name, callback) => {
     if (lobbies[lobbyCode]) {
       if (lobbies[lobbyCode].users.length >= 4) {
         return callback({ success: false, message: "Lobby is full" });
@@ -49,12 +54,19 @@ io.on("connection", (socket) => {
         return;
       }
       lobbies[lobbyCode].users.push(socket.id);
+      lobbies[lobbyCode].scores[socket.id] = null;
+      lobbies[lobbyCode].names[socket.id] = name;
 
-      console.log(`User joined lobby: ${lobbyCode}`);
+      console.log(`${name} joined lobby: ${lobbyCode}`);
       // Emit the updated user list to the lobby
       lobbies[lobbyCode].users.forEach((userId) => {
-        io.to(userId).emit("updateUsers", lobbies[lobbyCode].users); // This emits the event to each user
+        io.to(userId).emit(
+          "updateUsers",
+          lobbies[lobbyCode].users,
+          lobbies[lobbyCode].names
+        ); // This emits the event to each user
       });
+      console.log(lobbies[lobbyCode]);
     } else {
       callback({
         success: false,
@@ -70,11 +82,17 @@ io.on("connection", (socket) => {
       const userIndex = lobbies[lobbyCode].users.indexOf(socket.id);
       if (userIndex !== -1) {
         lobbies[lobbyCode].users.splice(userIndex, 1);
+        delete lobbies[lobbyCode].scores[socket.id];
+        delete lobbies[lobbyCode].names[socket.id];
         console.log(`User left the lobby: ${lobbyCode}`);
 
         // Emit the updated user list to the lobby
         lobbies[lobbyCode].users.forEach((userId) => {
-          io.to(userId).emit("updateUsers", lobbies[lobbyCode].users); // This emits the event to each user
+          io.to(userId).emit(
+            "updateUsers",
+            lobbies[lobbyCode].users,
+            lobbies[lobbyCode].names
+          ); // This emits the event to each user
         });
         callback({ success: true });
       } else {
@@ -111,6 +129,16 @@ io.on("connection", (socket) => {
     if (lobbies[lobbyCode]) {
       lobbies[lobbyCode].users.forEach((userId) => {
         io.to(userId).emit("codingProblem", lobbies[lobbyCode].lobbyProblem);
+      });
+    }
+  });
+
+  socket.on("updateScore", (lobbyCode, score) => {
+    if (lobbies[lobbyCode]) {
+      lobbies[lobbyCode].scores[socket.id] = score;
+      console.log(lobbies[lobbyCode].scores);
+      lobbies[lobbyCode].users.forEach((userId) => {
+        io.to(userId).emit("updateScoreEvent", lobbies[lobbyCode].scores, lobbies[lobbyCode].names);
       });
     }
   });
