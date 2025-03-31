@@ -4,6 +4,7 @@ import "../styles/general.css"; // Import existing general styles
 import "./lobbyPage.css"; // Import your specific lobby styles
 import { getDailyChallenge } from "./lobbyPageAPI";
 import { useLocation, useNavigate } from "react-router-dom";
+import { config } from '../../config.ts';
 
 interface Leader {
   username: string;
@@ -11,8 +12,6 @@ interface Leader {
 }
 
 const Lobby = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
   const [leaders, setLeaders] = useState<Leader[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +20,7 @@ const Lobby = () => {
     const fetchLeaders = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8082/api/user/top-users"
+          `${config.api.user}/top-users`
         );
         if (!response.ok) {
           throw new Error("Failed to fetch leaderboard data");
@@ -40,34 +39,8 @@ const Lobby = () => {
     fetchLeaders();
   }, []);
 
-  const handleMatch = async (e: React.FormEvent) => {
-    e.preventDefault();
-        setLoading(true);
-        setError(null);
-    
-    try {
-      console.log("Generating daily challenge...");
-      const data = await getDailyChallenge();
-      console.log(data);
-      console.log(data[0]);
-      switch (data[0].problemType) {
-        case "coding":
-          navigate("/coding", { state: { problem: data, problemIndex: 0, dailyChallenge: true } });
-          break;
-        case "mcq":
-          navigate("/mcq", { state: { problem: data, problemIndex: 0, dailyChallenge: true } });
-          break;
-        case "fill":
-          navigate("/fill-in-the-blank", { state: { problem: data, problemIndex: 0, dailyChallenge: true } });
-          break;
-        default:
-          break;
-      }
-    } catch (err) {
-      setError("Failed to generate question");
-    } finally {
-      setLoading(false);
-    }
+  const handleMatch = () => {
+    console.log("Match button clicked");
   };
 
   return (
@@ -81,7 +54,7 @@ const Lobby = () => {
         width: "100%",
       }}
     >
-      <div className="page-content">
+      <div className="flex flex-col items-center pt-20">
         <h1 className="pb-6">Ranked Leaderboard</h1>
 
         {loading && <p>Loading leaderboard...</p>}
@@ -96,7 +69,7 @@ const Lobby = () => {
               </tr>
             </thead>
             <tbody>
-              {leaders.slice(0, 5).map((leader, index) => (
+              {leaders.map((leader, index) => (
                 <tr key={index}>
                   <td>{leader.rank}</td>
                   <td>{leader.username}</td>
@@ -105,7 +78,6 @@ const Lobby = () => {
             </tbody>
           </table>
         )}
-
 
         <button
               onClick={handleMatch}
@@ -116,7 +88,7 @@ const Lobby = () => {
                         dark:shadow-lg dark:shadow-cyan-800/80 font-bold
                         rounded-xl text-2xl px-10 py-3 w-full max-w-md
                         text-center mb-6 transition-all duration-300">
-              Enter the Daily Challenge!
+              Match
             </button>
       </div>
     </div>

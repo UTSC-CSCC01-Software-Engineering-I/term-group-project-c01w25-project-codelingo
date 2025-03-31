@@ -212,7 +212,7 @@ const ProblemPage = () => {
                             text-lg text-gray-400 border-0 border-b-2 
                             border-gray-200 appearance-none dark:text-gray-400
                             dark:border-gray-700 focus:outline-none focus:ring-0
-                            focus:border-gray-200 peer flex flex-end"
+                            focus:border-gray-200 peer flex-end"
                   value={formData.problemDifficulty}
                   onChange={handleInputChange}
                 >

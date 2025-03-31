@@ -9,9 +9,7 @@ import bodyParser from 'body-parser';
 const app = express();
 const port = 8082;
 
-app.use(cors({
-  origin: '*'
-}));
+app.use(cors());
 
 app.use(express.json());
 app.use(bodyParser.json());

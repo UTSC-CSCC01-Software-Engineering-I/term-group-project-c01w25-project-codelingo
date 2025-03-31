@@ -34,7 +34,7 @@ const LoginPage: React.FC = () => {
                 setError(response.error);
             }
         } catch (error) {
-            setError((error as Error).message);
+            setError("Server error. Please try again.");
             console.error("Login Failed", error);
         }
     };

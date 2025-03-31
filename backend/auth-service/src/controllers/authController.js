@@ -11,19 +11,6 @@ export default {
                 return res.status(400).json({ error: 'Missing parameters in the request body' });
             }
 
-            if (password.length < 6) {
-                return res.status(400).json({ error: 'Password must be at least 6 characters long.' });
-            }
-
-            if (/\s/.test(password)) {
-                return res.status(400).json({ error: 'Password must not contain whitespace.' });
-            }
-
-            if (username.length < 3) {
-                return res.status(400).json({ error: 'Username must be at least 3 characters long.' });
-            }
-
-
             let checkExistEmail;
             try {
                 checkExistEmail = await admin.auth().getUserByEmail(email);

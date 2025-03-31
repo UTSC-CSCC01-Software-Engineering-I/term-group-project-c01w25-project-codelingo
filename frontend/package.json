@@ -17,6 +17,7 @@
     "@tailwindcss/vite": "^4.0.2",
     "@uiw/codemirror-theme-dracula": "^4.23.10",
     "@uiw/react-codemirror": "^4.23.10",
+    "axios": "^1.8.4",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.4.7",
     "firebase": "^11.4.0",

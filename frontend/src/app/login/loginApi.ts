@@ -1,10 +1,11 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase";
 
-export const API_BASE_URL = "http://localhost:8081/api/auth";
+
+import { config } from '../../config.ts';
 
 export const loginUser = async (email: string, password: string) => {
-    const response = await fetch(`${API_BASE_URL}/login`, {
+    const response = await fetch(`${config.api.auth}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -15,7 +16,7 @@ export const loginUser = async (email: string, password: string) => {
 };
 
 export const resetPassword = async (oobCode: string, newPassword: string) => {
-    const response = await fetch(`${API_BASE_URL}/reset-password`, {
+    const response = await fetch(`${config.api.auth}/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ oobCode, newPassword }),

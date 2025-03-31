@@ -10,9 +10,7 @@ import authRoutes from "./src/routes/authRoutes.js";
 const app = express();
 const port = 8081;
 
-app.use(cors({
-  origin: '*'
-}));
+app.use(cors());
 
 app.use(express.json());
 app.use(bodyParser.json());

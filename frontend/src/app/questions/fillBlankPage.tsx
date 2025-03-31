@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import background from "../../assets/landing.jpg";
 import "../styles/general.css";
-import Timer from "./timer";
 
 interface Option {
   option: string;
@@ -33,56 +32,15 @@ const FillBlankPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const problem: Problem = location.state?.problem;
-    const [dailyChallenge] = useState(location.state?.dailyChallenge || false);
-    const [problemIndex] = useState(location.state?.problemIndex || 0);
   
     const [userAnswer, setUserAnswer] = useState("");
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [showLengthHint, setShowLengthHint] = useState(false);
     const [showFirstLetterHint, setShowFirstLetterHint] = useState(false);
     const [showAnswer, setShowAnswer] = useState(false);
-
-    const [elapsedTime, setElapsedTime] = useState(0);
-    const [points] = useState(location.state?.points || 0);
   
-    const handleNext = () => {
-      if (!dailyChallenge) return;
-  
-      let finalScore = points;
-      if (!isCorrect || showAnswer) {
-        finalScore = Math.floor(0 + points);
-        console.log("Final Score:", finalScore);
-      } else if (showLengthHint && showFirstLetterHint) {
-        finalScore = Math.max(Math.floor(1000 - elapsedTime * 5), 0) + points;
-        console.log("Final Score:", finalScore);
-      } else if (showLengthHint) {
-        finalScore = Math.max(Math.floor(2000 - elapsedTime * 5), 0) + points;
-        console.log("Final Score:", finalScore);
-      }
-      else {
-        finalScore = Math.max(Math.floor(3000 - elapsedTime * 5), 0) + points;
-        console.log("Final Score:", finalScore);
-      }
-      if (!problem[problemIndex + 1]) {
-        navigate("/lobby");
-        return;
-      }
-      switch (problem[problemIndex + 1].problemType) {
-        case "coding":
-          navigate("/coding", { state: { problem: problem, problemIndex: problemIndex + 1, dailyChallenge: true, points: finalScore}, });
-          break;
-        case "mcq":
-          navigate("/mcq", { state: { problem: problem, problemIndex: problemIndex + 1, dailyChallenge: true, points: finalScore } });
-          break;
-        case "fill":
-          navigate("/fill-in-the-blank", {state: { problem: problem, problemIndex: problemIndex + 1, dailyChallenge: true, points: finalScore }});
-          break;
-        default:
-          break;
-      }
-    }
     const handleSubmit = () => {
-      if (userAnswer.trim().toLowerCase() === problem[problemIndex].correctAnswer?.toLowerCase()) {
+      if (userAnswer.trim().toLowerCase() === problem.correctAnswer?.toLowerCase()) {
         setIsCorrect(true);
       } else {
         setIsCorrect(false);
@@ -93,7 +51,7 @@ const FillBlankPage = () => {
         navigate(-1);
     };
 
-    if (!problem[problemIndex]) {
+    if (!problem) {
         return (
           <div
             className="text-white text-center"
@@ -136,12 +94,11 @@ const FillBlankPage = () => {
         paddingBottom: "10vh",
         }}
         >
-          <Timer onTimeUpdate={setElapsedTime} />
             <div className='w-3/4 bg-gray-900 rounded-2xl shadow-2xl p-10 mt-10'>
             <h2 className="text-white text-3xl font-bold mt-10 mb-5">
-                {problem[problemIndex].title}
+                {problem.title}
             </h2>
-            <p className="mt-4">{problem[problemIndex].problemDescription}</p>
+            <p className="mt-4">{problem.problemDescription}</p>
             
             <input
                 type="text"
@@ -161,7 +118,7 @@ const FillBlankPage = () => {
                     </button>
                     )}
                     {showLengthHint && (
-                    <p className="text-gray-300">Answer Length: {problem[problemIndex].correctAnswer?.length} characters</p>
+                    <p className="text-gray-300">Answer Length: {problem.correctAnswer?.length} characters</p>
                     )}
         
                     {!showFirstLetterHint && (
@@ -173,7 +130,7 @@ const FillBlankPage = () => {
                     </button>
                     )}
                     {showFirstLetterHint && (
-                    <p className="text-gray-300">First Letter: {problem[problemIndex].correctAnswer?.charAt(0)}</p>
+                    <p className="text-gray-300">First Letter: {problem.correctAnswer?.charAt(0)}</p>
                     )}
                     {!showAnswer && (
                         <button 
@@ -186,7 +143,7 @@ const FillBlankPage = () => {
                 </div>
 
                 {showAnswer && (
-                    <p className="mt-4">Answer: {problem[problemIndex].correctAnswer}</p>
+                    <p className="mt-4">Answer: {problem.correctAnswer}</p>
                 )}
 
                 {isCorrect !== null && (
@@ -219,15 +176,6 @@ const FillBlankPage = () => {
                 >
                 Submit
                 </button>
-                {dailyChallenge &&  (
-                <button
-                onClick={handleNext}
-                type="submit"
-                className="bg-[#5a3dc3ce] text-white px-9 py-4 rounded-md
-                cursor-pointer text-lg leading-tight transition duration-300
-                hover:bg-[#512fcace] active:bg-[#381aa2ce]"> Next 
-              </button>
-              )}
             </div>
         </div>
       );

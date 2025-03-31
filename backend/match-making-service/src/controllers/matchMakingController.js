@@ -11,6 +11,7 @@ function matchMakingController(io) {
       // Store the problem with the lobby
       lobbies[lobbyCode] = {
         players: [],
+        scores: {},
       };
 
       console.log(`Lobby ${lobbyCode} created with problem:`);
@@ -25,6 +26,7 @@ function matchMakingController(io) {
       }
 
       lobbies[lobbyCode].push({ socketId: socket.id, username });
+      lobbies[lobbyCode].scores.socketId = null;
       socket.join(lobbyCode);
       console.log(`${username} joined lobby ${lobbyCode}`);
 
@@ -65,6 +67,11 @@ function matchMakingController(io) {
           io.to(lobbyCode).emit("playerJoined", lobbies[lobbyCode]);
         }
       }
+    });
+
+    socket.on("updateScore", (lobbyCode, score) => {
+      lobbies[lobbyCode].scores[socket.id] = score;
+      io.to(lobbyCode).emit("scoreUpdated", lobbies[lobbyCode]);
     });
   });
 }
