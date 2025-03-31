@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import problemService from './services/problemService.js'; // Adjust as needed
 
-cron.schedule('0 20 * * *', async () => {
+cron.schedule('0 20 * * *', async () => { //change to * * * * * for every minute
   console.log('[Scheduler] Generating daily challenge problems at 12:00 AM...');
 
   const problemTypes = ["coding", "mcq", "fill"];

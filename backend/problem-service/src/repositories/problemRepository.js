@@ -90,7 +90,7 @@ export default {
       const today = new Date().toISOString().split('T')[0];
   
       // Reference to challenge/yyyy-mm-dd/
-      const challengeProblemRef = ref(db, `challenge/${today}`);
+      const challengeProblemRef = ref(db, `challenge/${today}/problems`);
       const newProblemRef = push(challengeProblemRef);
   
       // Save the problem under the date path
