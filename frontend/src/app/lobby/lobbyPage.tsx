@@ -81,7 +81,7 @@ const Lobby = () => {
         width: "100%",
       }}
     >
-      <div className="page-content">
+      <div className="flex flex-col items-center pt-20">
         <h1 className="pb-6">Ranked Leaderboard</h1>
 
         {loading && <p>Loading leaderboard...</p>}

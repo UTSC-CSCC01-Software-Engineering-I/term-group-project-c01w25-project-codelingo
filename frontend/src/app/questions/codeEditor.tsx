@@ -255,8 +255,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ onResultUpdate }) => {
           </div>
         </div>
       )}
-
-      <div className="button-group mt-4 justify-center items-center flex">
+      {!dailyChallenge && (
+        <div className="button-group mt-4 justify-center items-center flex">
         <button
           onClick={handleFinish}
           className="bg-blue-500 p-2 rounded-3xl hover:bg-blue-700 transition w-1/5"
@@ -264,6 +264,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ onResultUpdate }) => {
           Finish
         </button>
       </div>
+      )}
+      
     </div>
   );
 };

@@ -88,13 +88,13 @@ const PostGameReview = () => {
       }}
     >
       <div className="page-content">
-        <h1>Post Game Review</h1>
+        <h2 className="page-h1">Post Game Review</h2>
 
         {loading && <p>Loading game data...</p>}
 
         {lobbyCode && (
           <div className="bg-gray-600 w-4/5 p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold text-black">Players</h2>
+            <h3 className="text-xl font-semibold text-white">Players</h3>
             <p>
               <span className="text-sm">Name | Score</span>
             </p>
@@ -106,7 +106,7 @@ const PostGameReview = () => {
               return (
                 <div
                   key={index}
-                  className="flex justify-between items-center py-3 border-b border-gray-200"
+                  className="flex justify-between items-center py-3 border-b border-gray-200 text-center"
                 >
                   <p className="text-lg text-black">
                     <span className="font-semibold">{index + 1}. </span>
