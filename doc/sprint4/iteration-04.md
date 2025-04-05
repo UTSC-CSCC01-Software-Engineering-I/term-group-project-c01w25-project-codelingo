@@ -106,10 +106,6 @@ As with prior sprints, roles were flexible, and team members frequently collabor
 - **CI/CD Pipeline Finalization:**  
   Pipeline now runs backend and frontend tests, then auto-deploys on release tag.
 
-#### ❌ Deferred or Not Fully Completed
-
-- Some unit tests for frontend components were deprioritized due to focus on final feature completion.
-
 <br>
 
 ---
@@ -121,9 +117,8 @@ As with prior sprints, roles were flexible, and team members frequently collabor
 - **Jira User Stories:**  
   Covered user-focused outcomes like GitHub integration, interactive lessons, and motivation through streaks.
 
-- **API Docs:**  
-  Documented endpoints like `/streaks`, `/github/upload`, and `/challenges/submit`.
-
+- **API Docs**  
+ 
 - **Test Coverage Reports:**  
   Tracked backend and frontend test results for CI/CD validation.
 
